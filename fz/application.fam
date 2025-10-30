@@ -1,0 +1,11 @@
+App(
+    appid="ubit_data_gathering",
+    name="uBit: Data Gathering",
+    apptype=FlipperAppType.EXTERNAL,
+    entry_point="ubit_controller",
+    requires=["gui"],
+    stack_size=1 * 1024,
+    fap_icon="example_ble_beacon_10px.png",
+    fap_category="uBit",
+    fap_icon_assets="images",
+)
