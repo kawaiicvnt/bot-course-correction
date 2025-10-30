@@ -1,0 +1,19 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/home/evie/Documents/projects/microbit/microbit-samples/yotta_modules/microbit/inc/",
+                "/usr/arm-none-eabi/include/",
+                "/home/evie/Documents/projects/microbit/microbit-samples/yotta_modules/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-clang-x64"
+        }
+    ],
+    "version": 4
+}

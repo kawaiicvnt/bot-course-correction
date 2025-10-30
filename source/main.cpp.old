@@ -1,13 +1,37 @@
-                                                    #include "MicroBit.h"
+/*
+The MIT License (MIT)
+
+Copyright (c) 2016 British Broadcasting Corporation.
+This software is provided by Lancaster University by arrangement with the BBC.
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+*/
+
+#include "MicroBit.h"
 #include "Debug.h"
 #include "Magnetometer.h"
 #include "PinNames.h"
-#include "main.h"
 
 MicroBit uBit;
 uint8_t speed = 100;
 uint8_t tilt = 0;
-uint8_t menu = 0;
+MicroBitSerial serial(uBit.io.P4.name, uBit.io.P4.name, 20U, 20U);
 
 ManagedString toHex(uint8_t var) {
     char hex[3];
@@ -87,71 +111,15 @@ static void backward(MicroBitEvent)
 }
 static void stop(MicroBitEvent)
 {
-    // printf(">> Sending stop command\n");
+    printf(">> Sending stop command\n");
     uBit.radio.datagram.send("S");
-}
-
-static void moveForward(MicroBitEvent)
-{
-    uBit.sleep(50);
-    while (uBit.buttonB.isPressed() && !uBit.buttonA.isPressed()) {
-        calculateTiltAngle();
-        printf(ManagedString(">> Sending forward command with speed: ") + speed + ManagedString(" and tilt: ") + tilt + ManagedString("\n"));
-        uBit.radio.datagram.send("F" + toHex(speed) + toHex(tilt));
-        uBit.sleep(50);
-    }
-}
-
-static void moveBackward(MicroBitEvent)
-{
-    uBit.sleep(50);
-    while (uBit.buttonA.isPressed() && !uBit.buttonB.isPressed()) {
-        calculateTiltAngle();
-        printf(ManagedString(">> Sending backward command with speed: ") + speed + ManagedString(" and tilt: ") + tilt + ManagedString("\n"));
-        uBit.radio.datagram.send("B" + toHex(speed) + toHex(tilt));
-        uBit.sleep(50);
-    }
 }
 
 static void changeSpeed(MicroBitEvent)
 {
+    printf(ManagedString(">> Changing speed: ") + speed);
     speed = ((speed + 25) % 225) + 25;
-    printf(ManagedString(">> Changing speed: ") + speed + ManagedString("\n"));
-    uBit.display.printAsync((int) speed);
-}
-
-static void changeSpeed(bool increase) {
-    if (increase) {
-        speed += 25;
-    } else {
-        speed -= 25;
-    }
-    if (speed < 0) {
-        speed = 0;
-    } else if (speed > 250) {
-        speed = 250;
-    }
-    printf(ManagedString(">> Changing speed: ") + speed + ManagedString("\n"));
-    uBit.display.printAsync((int) speed);
-}
-
-static void increaseSpeed(MicroBitEvent)
-{
-    speed += 25;
-    if (speed > 250) {
-        speed = 250;
-    }
-    printf(ManagedString(">> Increasing speed: ") + speed + ManagedString("\n"));
-    uBit.display.printAsync((int) speed);
-}
-
-static void decreaseSpeed(MicroBitEvent)
-{
-    speed -= 25;
-    if (speed < 0) {
-        speed = 0;
-    }
-    printf(ManagedString(">> Decreasing speed: ") + speed + ManagedString("\n"));
+    printf(ManagedString(" and tilt: ") + tilt + ManagedString("\n"));
     uBit.display.printAsync((int) speed);
 }
 
@@ -166,19 +134,11 @@ static void controller() {
     while (1) {
         if (uBit.buttonAB.isPressed()) {
             uBit.display.image.setPixelValue(2, 2, 255);
-            // Make sure we let go of AB first
-            while (uBit.buttonAB.isPressed()) {
-                uBit.sleep(50);
-            }
-            while (1) {
-                if (uBit.buttonAB.isPressed()) {
-                    break;
-                } else if (uBit.buttonA.isPressed()) {
-                    changeSpeed(false);
-                } else if (uBit.buttonB.isPressed()) {
-                    changeSpeed(true);
-                }
-                uBit.sleep(50);
+            uBit.sleep(1000);
+            if (uBit.buttonAB.isPressed()) {
+                calibrate(MicroBitEvent());
+            } else {
+                changeSpeed(MicroBitEvent());
             }
             uBit.display.image.clear();
         } else if (uBit.buttonA.isPressed()) {
@@ -188,45 +148,14 @@ static void controller() {
         } else {
             stop(MicroBitEvent());
         }
-        uBit.sleep(250);
-    }
-}
-
-static void menuChange(MicroBitEvent)
-{
-    switch (menu) {
-        case MENU_DEFAULT:
-            uBit.display.image.clear();
-            uBit.messageBus.ignore(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, decreaseSpeed);
-            uBit.messageBus.ignore(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, increaseSpeed);
-            uBit.messageBus.ignore(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_HOLD, calibrate);
-            uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_DOWN, moveBackward);
-            uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_DOWN, moveForward);
-            uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_UP, stop);
-            uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_UP, stop);
-            menu++;
-            break;
-        case MENU_CHANGE_SPEED:
-            uBit.display.printCharAsync('S');
-            uBit.messageBus.ignore(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_DOWN, moveBackward);
-            uBit.messageBus.ignore(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_DOWN, moveForward);
-            uBit.messageBus.ignore(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_UP, stop);
-            uBit.messageBus.ignore(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_UP, stop);
-            uBit.messageBus.listen(MICROBIT_ID_BUTTON_A, MICROBIT_BUTTON_EVT_CLICK, decreaseSpeed);
-            uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, increaseSpeed);
-            uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_HOLD, calibrate);
-            menu++;
-            break;
-        default:
-            menu = 0;
-    }
-    if (menu > 1) {
-        menu = 0;
+        uBit.sleep(50);
     }
 }
 
 void debug_fiber() {
     uBit.serial.send("Debug fiber started!\n>> Type 'H' for help\n>> -----------------------------\n");
+    ManagedString data = serial.readUntil(ManagedString("\r\n"));
+    serial.send(data);
     // uBit.display.printAsync(uBit.serial.isReadable());
     // uBit.display.printAsync(uBit.serial.rxInUse());
     uBit.serial.clearRxBuffer();
@@ -257,10 +186,8 @@ int main()
     // uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_DOWN, forward);
     // uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_UP, stop);
     // uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, changeSpeed);
-    // uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_LONG_CLICK, calibrate);
+    uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_LONG_CLICK, calibrate);
     // printf("Done!\n");
-    uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, menuChange);
-    menuChange(MicroBitEvent());
 
     printf(">> Starting controller... ");
     // create_fiber(controller);
