@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="VcsDirectoryMappings">
+    <mapping directory="" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libraries/codal-core" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libraries/codal-microbit-nrf5sdk" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libraries/codal-microbit-v2" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libraries/codal-nrf52" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/libraries/codal-nrf52/nrfx" vcs="Git" />
+  </component>
+</project>

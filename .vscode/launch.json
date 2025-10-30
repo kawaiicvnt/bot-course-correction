@@ -38,7 +38,11 @@
           ],
           "openOCDLaunchCommands": [
             "adapter speed 8000"
-          ]
+          ],
+          "liveWatch": {
+            "enabled": true,
+            "samplesPerSecond": 4
+          }
       },
       {
           "name": "(attach) micro:bit OpenOCD Cortex Debug",
