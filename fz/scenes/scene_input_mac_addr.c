@@ -1,4 +1,4 @@
-#include "../ble_beacon_app.h"
+#include "../microbit_data.h"
 
 static void ble_beacon_app_scene_add_type_byte_input_callback(void* context) {
     BleBeaconApp* ble_beacon = context;

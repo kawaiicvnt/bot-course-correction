@@ -1,4 +1,4 @@
-#include "ble_beacon_app.h"
+#include "microbit_data.h"
 
 #include <extra_beacon.h>
 #include <furi_hal_version.h>
@@ -114,7 +114,7 @@ static void ble_beacon_app_free(BleBeaconApp* app) {
     free(app);
 }
 
-int32_t ble_beacon_app(void* args) {
+int32_t microbit_data(void* args) {
     UNUSED(args);
 
     BleBeaconApp* app = ble_beacon_app_alloc();

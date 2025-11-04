@@ -1,4 +1,4 @@
-#include "../ble_beacon_app.h"
+#include "../microbit_data.h"
 #include <microbit_data_icons.h>
 
 static void
