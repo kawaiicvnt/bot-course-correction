@@ -1,4 +1,4 @@
-                                                    #include "MicroBit.h"
+#include "MicroBit.h"
 #include "Debug.h"
 #include "Magnetometer.h"
 #include "PinNames.h"

@@ -1,3 +1,4 @@
+.cache
 build
 libraries
 .yotta.json
