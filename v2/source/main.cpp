@@ -1,10 +1,9 @@
-#include "CodalStuff.h"
 #include "MicroBit.h"
 #include "Magnetometer.h"
-#include "CodalDmesg.h"
 #include "Debug.h"
 #include "Course.h"
 #include "AlphaBot2.h"
+#include <cstdint>
 
 // Assuming AlphaBot2 constructor takes no arguments or different arguments
 AlphaBot2 alphabot;
@@ -20,6 +19,12 @@ float steer_weight = 1;
 Timer c_inactivity();
 
 CoordinateSpace uprightFacingAway(SIMPLE_CARTESIAN, false, COORDINATE_SPACE_ROTATED_180);
+
+struct debug_bot_state {
+  mag_acc_data mad;
+  int16_t speed_l;
+  int16_t speed_r;
+};
 
 int fromHex(ManagedString str) {
     int value = 0;
@@ -89,7 +94,6 @@ void move(MicroBitEvent) {
     // ManagedString data = ManagedString((char *) packet.getBytes());
     ManagedString data = ble_uart->readUntil(ManagedString("\r\n"), SYNC_SLEEP);
     printf(ManagedString("> BLE received: ") + data);
-    // TODO: Add controller com timeout. 
     if (data == "LS") {
         alphabot.MotorRun(Motors::M1, 0);
     } else if (data == "RS") {
@@ -101,7 +105,6 @@ void move(MicroBitEvent) {
     } else if (data.charAt(0) == 'S') {
         alphabot.MotorRun(Motors::M1, 0);
         alphabot.MotorRun(Motors::M2, 0);
-        // TODO: Let the controller know we've received the stop signal.
     } else if (data.charAt(0) == 'F') {
         Speed speed = determine_motor_speed_moving(fromHex(data.substring(1, 2)), fromHex(data.substring(3, 2)), true);
         printf(ManagedString("--> ") + data.substring(0,1) + ", " + data.substring(1, 2) + ", " + data.substring(3, 2) + " ");
@@ -109,7 +112,7 @@ void move(MicroBitEvent) {
         alphabot.MotorRun(Motors::M1, speed.speed_l);
         alphabot.MotorRun(Motors::M2, speed.speed_r);
     } else if (data.charAt(0) == 'B') {
-        Speed speed = determine_motor_speed_moving(fromHex(data.substring(1, 2)), fromHex(data.substring(3, 4)), false);
+        Speed speed = determine_motor_speed_moving(fromHex(data.substring(1, 2)), fromHex(data.substring(3, 2)), false);
         printf(ManagedString("--> ") + data.substring(0,1) + ", " + data.substring(1, 2) + ", " + data.substring(3, 2) + " ");
         printf(ManagedString("--> B | Speed -> L: ") + speed.speed_l + ManagedString(" | R: ") + speed.speed_r);
         alphabot.MotorRun(Motors::M1, -speed.speed_r);
@@ -153,9 +156,9 @@ int main()
     printf("Done!\n");
 
     printf("> Setting up BLE UART service... ");
-    uBit.bleManager.init("botto(m)", uBit.getSerial(), uBit.messageBus, uBit.storage, false);
-    uBit.bleManager.advertise();
-    uBit.bleManager.setTransmitPower(7);
+    //uBit.bleManager.init("botto(m)", uBit.getSerial(), uBit.messageBus, uBit.storage, false);
+    //uBit.bleManager.advertise();
+    //uBit.bleManager.setTransmitPower(7);
     ble_uart = new MicroBitUARTService(*uBit.ble, 32, 32);
     ble_uart->eventOn("\r\n");
     printf("Done!\n");
