@@ -6,6 +6,8 @@
 #define AB2_LR_THRESHOLD 10 // TODO: If I go for a 13-bit value, I should set thresh to 160
 #define AB2_HEADING_THRESHOLD 5
 
+#include "Magnetometer.h"
+
 extern mag_acc_data ma_d;
 
 /*

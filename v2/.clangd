@@ -1,0 +1,5 @@
+CompileFlags:
+  Add: [
+    #--query-driver "/usr/bin/arm-none-eabi-g++"
+    -I/home/kawaiicvnt/Documents/projects/thesis/thesis/v2/
+  ]

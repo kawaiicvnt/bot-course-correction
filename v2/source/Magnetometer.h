@@ -1,9 +1,7 @@
 #ifndef MAGNETOMETER_H
 #define MAGNETOMETER_H
 
-#include "MicroBit.h"
 #include "Helper.h"
-using namespace std;
 
 #define DEFAULT_SAMPLES 5
 #define GAUSS_ALPHA 0.25 // Low-pass filter alpha value for gauss data
