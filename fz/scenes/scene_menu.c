@@ -6,12 +6,12 @@ enum SubmenuIndex {
 };
 
 static void ble_beacon_app_scene_menu_submenu_callback(void* context, uint32_t index) {
-    BleBeaconApp* ble_beacon = context;
+    MicrobitApp* ble_beacon = context;
     view_dispatcher_send_custom_event(ble_beacon->view_dispatcher, index);
 }
 
 void ble_beacon_app_scene_menu_on_enter(void* context) {
-    BleBeaconApp* ble_beacon = context;
+    MicrobitApp* ble_beacon = context;
     Submenu* submenu = ble_beacon->submenu;
 
     submenu_add_item(
@@ -27,11 +27,11 @@ void ble_beacon_app_scene_menu_on_enter(void* context) {
         ble_beacon_app_scene_menu_submenu_callback,
         ble_beacon);
 
-    view_dispatcher_switch_to_view(ble_beacon->view_dispatcher, BleBeaconAppViewSubmenu);
+    view_dispatcher_switch_to_view(ble_beacon->view_dispatcher, MicrobitAppViewSubmenu);
 }
 
 bool ble_beacon_app_scene_menu_on_event(void* context, SceneManagerEvent event) {
-    BleBeaconApp* ble_beacon = context;
+    MicrobitApp* ble_beacon = context;
     SceneManager* scene_manager = ble_beacon->scene_manager;
 
     bool consumed = false;
@@ -51,6 +51,6 @@ bool ble_beacon_app_scene_menu_on_event(void* context, SceneManagerEvent event) 
 }
 
 void ble_beacon_app_scene_menu_on_exit(void* context) {
-    BleBeaconApp* ble_beacon = context;
+    MicrobitApp* ble_beacon = context;
     submenu_reset(ble_beacon->submenu);
 }

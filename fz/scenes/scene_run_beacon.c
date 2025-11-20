@@ -3,25 +3,25 @@
 
 static void
     ble_beacon_app_scene_run_beacon_confirm_dialog_callback(DialogExResult result, void* context) {
-    BleBeaconApp* ble_beacon = context;
+    MicrobitApp* ble_beacon = context;
 
     view_dispatcher_send_custom_event(ble_beacon->view_dispatcher, result);
 }
 
-static void update_status_text(BleBeaconApp* ble_beacon) {
+static void update_status_text(MicrobitApp* ble_beacon) {
     DialogEx* dialog_ex = ble_beacon->dialog_ex;
 
-    dialog_ex_set_header(dialog_ex, "BLE Beacon Demo", 64, 0, AlignCenter, AlignTop);
+    dialog_ex_set_header(dialog_ex, "Ada is waif", 64, 0, AlignCenter, AlignTop);
 
     FuriString* status = ble_beacon->status_string;
 
     furi_string_reset(status);
 
     furi_string_cat_str(status, "Status: ");
-    if(ble_beacon->is_beacon_active) {
-        furi_string_cat_str(status, "Running\n");
+    if(ble_beacon->is_device_connected) {
+        furi_string_cat_str(status, "Connected\n");
     } else {
-        furi_string_cat_str(status, "Stopped\n");
+        furi_string_cat_str(status, "Disconnected\n");
     }
 
     // Output MAC in reverse order
@@ -48,15 +48,15 @@ static void update_status_text(BleBeaconApp* ble_beacon) {
 }
 
 void ble_beacon_app_scene_run_beacon_on_enter(void* context) {
-    BleBeaconApp* ble_beacon = context;
+    MicrobitApp* ble_beacon = context;
 
     update_status_text(ble_beacon);
 
-    view_dispatcher_switch_to_view(ble_beacon->view_dispatcher, BleBeaconAppViewDialog);
+    view_dispatcher_switch_to_view(ble_beacon->view_dispatcher, MicrobitAppViewDialog);
 }
 
 bool ble_beacon_app_scene_run_beacon_on_event(void* context, SceneManagerEvent event) {
-    BleBeaconApp* ble_beacon = context;
+    MicrobitApp* ble_beacon = context;
     SceneManager* scene_manager = ble_beacon->scene_manager;
 
     if(event.type == SceneManagerEventTypeCustom) {
@@ -74,6 +74,6 @@ bool ble_beacon_app_scene_run_beacon_on_event(void* context, SceneManagerEvent e
 }
 
 void ble_beacon_app_scene_run_beacon_on_exit(void* context) {
-    BleBeaconApp* ble_beacon = context;
+    MicrobitApp* ble_beacon = context;
     UNUSED(ble_beacon);
 }

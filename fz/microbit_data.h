@@ -37,18 +37,20 @@ typedef struct {
 
     GapExtraBeaconConfig beacon_config;
     uint8_t beacon_data[EXTRA_BEACON_MAX_DATA_SIZE];
+    uint8_t target_address[EXTRA_BEACON_MAC_ADDR_SIZE];
     uint8_t beacon_data_len;
     bool is_beacon_active;
-} BleBeaconApp;
+    bool is_device_connected;
+} MicrobitApp;
 
 typedef enum {
-    BleBeaconAppViewSubmenu,
-    BleBeaconAppViewByteInput,
-    BleBeaconAppViewDialog,
-} BleBeaconAppView;
+    MicrobitAppViewSubmenu,
+    MicrobitAppViewByteInput,
+    MicrobitAppViewDialog,
+} MicrobitAppView;
 
 typedef enum {
     BleBeaconAppCustomEventDataEditResult = 100,
-} BleBeaconAppCustomEvent;
+} MicrobitAppCustomEvent;
 
-void ble_beacon_app_update_state(BleBeaconApp* app);
+void ble_beacon_app_update_state(MicrobitApp* app);

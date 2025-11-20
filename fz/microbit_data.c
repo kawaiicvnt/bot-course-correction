@@ -9,23 +9,23 @@
 
 static bool ble_beacon_app_custom_event_callback(void* context, uint32_t event) {
     furi_assert(context);
-    BleBeaconApp* app = context;
+    MicrobitApp* app = context;
     return scene_manager_handle_custom_event(app->scene_manager, event);
 }
 
 static bool ble_beacon_app_back_event_callback(void* context) {
     furi_assert(context);
-    BleBeaconApp* app = context;
+    MicrobitApp* app = context;
     return scene_manager_handle_back_event(app->scene_manager);
 }
 
 static void ble_beacon_app_tick_event_callback(void* context) {
     furi_assert(context);
-    BleBeaconApp* app = context;
+    MicrobitApp* app = context;
     scene_manager_handle_tick_event(app->scene_manager);
 }
 
-static void ble_beacon_app_restore_beacon_state(BleBeaconApp* app) {
+static void ble_beacon_app_restore_beacon_state(MicrobitApp* app) {
     // Restore beacon data from service
     GapExtraBeaconConfig* local_config = &app->beacon_config;
     const GapExtraBeaconConfig* config = furi_hal_bt_extra_beacon_get_config();
@@ -55,10 +55,11 @@ static void ble_beacon_app_restore_beacon_state(BleBeaconApp* app) {
 
     // Restore last beacon data
     app->beacon_data_len = furi_hal_bt_extra_beacon_get_data(app->beacon_data);
+
 }
 
-static BleBeaconApp* ble_beacon_app_alloc(void) {
-    BleBeaconApp* app = malloc(sizeof(BleBeaconApp));
+static MicrobitApp* ble_beacon_app_alloc(void) {
+    MicrobitApp* app = malloc(sizeof(MicrobitApp));
 
     app->gui = furi_record_open(RECORD_GUI);
 
@@ -78,25 +79,28 @@ static BleBeaconApp* ble_beacon_app_alloc(void) {
 
     app->submenu = submenu_alloc();
     view_dispatcher_add_view(
-        app->view_dispatcher, BleBeaconAppViewSubmenu, submenu_get_view(app->submenu));
+        app->view_dispatcher, MicrobitAppViewSubmenu, submenu_get_view(app->submenu));
 
     app->dialog_ex = dialog_ex_alloc();
     view_dispatcher_add_view(
-        app->view_dispatcher, BleBeaconAppViewDialog, dialog_ex_get_view(app->dialog_ex));
+        app->view_dispatcher, MicrobitAppViewDialog, dialog_ex_get_view(app->dialog_ex));
 
     app->byte_input = byte_input_alloc();
     view_dispatcher_add_view(
-        app->view_dispatcher, BleBeaconAppViewByteInput, byte_input_get_view(app->byte_input));
+        app->view_dispatcher, MicrobitAppViewByteInput, byte_input_get_view(app->byte_input));
 
     ble_beacon_app_restore_beacon_state(app);
+
+    // Set target address to zero
+    memset(app->target_address, 0, EXTRA_BEACON_MAC_ADDR_SIZE * sizeof(uint8_t));
 
     return app;
 }
 
-static void ble_beacon_app_free(BleBeaconApp* app) {
-    view_dispatcher_remove_view(app->view_dispatcher, BleBeaconAppViewByteInput);
-    view_dispatcher_remove_view(app->view_dispatcher, BleBeaconAppViewSubmenu);
-    view_dispatcher_remove_view(app->view_dispatcher, BleBeaconAppViewDialog);
+static void ble_beacon_app_free(MicrobitApp* app) {
+    view_dispatcher_remove_view(app->view_dispatcher, MicrobitAppViewByteInput);
+    view_dispatcher_remove_view(app->view_dispatcher, MicrobitAppViewSubmenu);
+    view_dispatcher_remove_view(app->view_dispatcher, MicrobitAppViewDialog);
 
     free(app->byte_input);
     free(app->submenu);
@@ -117,7 +121,7 @@ static void ble_beacon_app_free(BleBeaconApp* app) {
 int32_t microbit_data(void* args) {
     UNUSED(args);
 
-    BleBeaconApp* app = ble_beacon_app_alloc();
+    MicrobitApp* app = ble_beacon_app_alloc();
 
     scene_manager_next_scene(app->scene_manager, BleBeaconAppSceneRunBeacon);
 
@@ -127,7 +131,7 @@ int32_t microbit_data(void* args) {
     return 0;
 }
 
-void ble_beacon_app_update_state(BleBeaconApp* app) {
+void ble_beacon_app_update_state(MicrobitApp* app) {
     furi_hal_bt_extra_beacon_stop();
 
     furi_check(furi_hal_bt_extra_beacon_set_config(&app->beacon_config));

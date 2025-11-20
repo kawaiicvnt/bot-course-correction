@@ -1,13 +1,13 @@
 #include "../microbit_data.h"
 
 static void ble_beacon_app_scene_add_type_byte_input_callback(void* context) {
-    BleBeaconApp* ble_beacon = context;
+    MicrobitApp* ble_beacon = context;
     view_dispatcher_send_custom_event(
         ble_beacon->view_dispatcher, BleBeaconAppCustomEventDataEditResult);
 }
 
 void ble_beacon_app_scene_input_beacon_data_on_enter(void* context) {
-    BleBeaconApp* ble_beacon = context;
+    MicrobitApp* ble_beacon = context;
     byte_input_set_header_text(ble_beacon->byte_input, "Enter beacon data");
 
     byte_input_set_result_callback(
@@ -18,11 +18,11 @@ void ble_beacon_app_scene_input_beacon_data_on_enter(void* context) {
         ble_beacon->beacon_data,
         sizeof(ble_beacon->beacon_data));
 
-    view_dispatcher_switch_to_view(ble_beacon->view_dispatcher, BleBeaconAppViewByteInput);
+    view_dispatcher_switch_to_view(ble_beacon->view_dispatcher, MicrobitAppViewByteInput);
 }
 
 bool ble_beacon_app_scene_input_beacon_data_on_event(void* context, SceneManagerEvent event) {
-    BleBeaconApp* ble_beacon = context;
+    MicrobitApp* ble_beacon = context;
     SceneManager* scene_manager = ble_beacon->scene_manager;
 
     if(event.type == SceneManagerEventTypeCustom) {
@@ -37,7 +37,7 @@ bool ble_beacon_app_scene_input_beacon_data_on_event(void* context, SceneManager
 }
 
 void ble_beacon_app_scene_input_beacon_data_on_exit(void* context) {
-    BleBeaconApp* ble_beacon = context;
+    MicrobitApp* ble_beacon = context;
 
     byte_input_set_result_callback(ble_beacon->byte_input, NULL, NULL, NULL, NULL, 0);
     byte_input_set_header_text(ble_beacon->byte_input, NULL);
