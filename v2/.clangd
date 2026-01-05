@@ -1,5 +1,22 @@
 CompileFlags:
+  #Compiler: /usr/bin/arm-none-eabi-g++
+  BuiltinHeaders: QueryDriver
   Add: [
-    #--query-driver "/usr/bin/arm-none-eabi-g++"
-    -I/home/kawaiicvnt/Documents/projects/thesis/thesis/v2/
+    -stdlib=libc++,
+    #--target=arm-none-eabi,
+    #-march=armv7-m,
+    #-mfloat-abi=hard,
+    -ferror-limit=0,
+    -Wno-system-headers,
+    #-I/home/kawaiicvnt/Documents/projects/thesis/thesis/v2,
+    -I/usr/arm-none-eabi/include,
+    -I/usr/arm-none-eabi/include/c++/15.2.0,
+    -I/usr/arm-none-eabi/include/c++/15.2.0/arm-none-eabi/thumb/v7e-m+fp/hard,
+    -I/usr/lib/gcc/arm-none-eabi/15.2.0/include,
+  ]
+
+Diagnostics:
+  Suppress: [
+    -Winvalid-constexpr,
+    -Wconstexpr-not-const,
   ]
