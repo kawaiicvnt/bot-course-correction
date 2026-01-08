@@ -1,7 +1,9 @@
 #include "Magnetometer.h"
+#include "ManagedString.h"
+#include "MicroBit.h"
 
 extern MicroBit uBit; // The micro:bit object
-extern mag_acc_data ma_d;
+extern mag_acc_data mad;
 
 mag_acc_data::mag_acc_data() {}
 
@@ -95,9 +97,9 @@ g_data get_acc_data(g_data old_data) {
 }
 
 void update_gauss_data_fiber() {
-    ma_d.init(); // Initialize the class holding our data hostage
+    mad.init(); // Initialize the class holding our data hostage
     while(true) {
-        ma_d.update();
+        mad.update();
         uBit.sleep(MAD_UPDATE_PERIOD);
     }
 }

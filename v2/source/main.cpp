@@ -1,13 +1,20 @@
-#include "MicroBit.h"
+// external deps
+#include "Compass.h"
 #include "Magnetometer.h"
-#include "Debug.h"
-#include "Course.h"
-#include "AlphaBot2.h"
+#include "ManagedString.h"
+#include "MicroBit.h"
+#include "MicroBitEvent.h"
+#include "MicroBitUARTService.h"
 #include <cstdint>
+// internal deps
+#include "AlphaBot2.h"
+#include "Magnetometer.h"
+#include "Course.h"
+#include "Debug.h"
 
 // Assuming AlphaBot2 constructor takes no arguments or different arguments
 AlphaBot2 alphabot;
-mag_acc_data ma_d; // Initialize the class holding our data hostage
+mag_acc_data mad; // Initialize the class holding our data hostage
 MicroBitUARTService *ble_uart;
 MicroBit uBit;
 MicroBitCompass *compass;
@@ -147,7 +154,7 @@ int main()
     compass = new MicroBitCompass(uBit.i2c, uprightFacingAway);
     accelerometer->autoDetect(uBit.i2c);
     compass->autoDetect(uBit.i2c);
-    ma_d.init();
+    mad.init();
     create_fiber(update_gauss_data_fiber);
     printf("Done!\n");
 

@@ -1,6 +1,9 @@
 #ifndef HELPER_CPP
 #define HELPER_CPP
-#include "MicroBit.h"
+
+#include "ManagedString.h"
+
+using namespace codal;
 
 /* Converts a given float into a string representation, with 4 decimal points.
  * 

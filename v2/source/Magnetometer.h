@@ -2,12 +2,15 @@
 #define MAGNETOMETER_H
 
 #include "Helper.h"
+#include "ManagedString.h"
 
 #define DEFAULT_SAMPLES 5
 #define GAUSS_ALPHA 0.25 // Low-pass filter alpha value for gauss data
 
 #define MAD_UPDATE_RATE 25 // Hz
 #define MAD_UPDATE_PERIOD (1000 / MAD_UPDATE_RATE) // ms
+
+using namespace codal;
 
 // stores Magnetometer data in Rads
 struct r_data {

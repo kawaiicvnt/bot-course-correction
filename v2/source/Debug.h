@@ -1,7 +1,10 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
-#include "MicroBit.h"
+#include <cstdint>
+#include "MicroBitCompat.h"
+
+using namespace codal;
 
 #define printf(...) uBit.serial.send(__VA_ARGS__)
 

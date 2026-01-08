@@ -6,9 +6,10 @@
 #define AB2_LR_THRESHOLD 10 // TODO: If I go for a 13-bit value, I should set thresh to 160
 #define AB2_HEADING_THRESHOLD 5
 
+#include "ManagedString.h"
 #include "Magnetometer.h"
 
-extern mag_acc_data ma_d;
+extern mag_acc_data mad;
 
 /*
  * Represents the robot's current state.
@@ -65,7 +66,7 @@ struct Robot {
     * @param speed_r The speed of the right motor.
     */    
     void set_speed(int speed_l, int speed_r) {
-        int heading = ma_d.heading_tilt();
+        int heading = mad.heading_tilt();
         // int heading = calc_heading_vertical_normalized(DEFAULT_SAMPLES);
         set_speed(speed_l, speed_r, heading);
     }
@@ -103,13 +104,13 @@ struct Robot {
 
     // TODO: Since this does not have a loop and cannot handle data, 
     void course_correct_towards_origin() {
-        int heading = ma_d.heading_tilt();
+        int heading = mad.heading_tilt();
         int offset = calc_heading_offset(org_heading, heading);
         course_correct(offset);
     }
 
     ManagedString toString() {
-        return ("Robot: { L: " + ManagedString(cur_speed_l) + ", R: " + ManagedString(cur_speed_r) + ", Offset: " + ManagedString(calc_heading_offset(org_heading, ma_d.heading_tilt())) + " }");
+        return ("Robot: { L: " + ManagedString(cur_speed_l) + ", R: " + ManagedString(cur_speed_r) + ", Offset: " + ManagedString(calc_heading_offset(org_heading, mad.heading_tilt())) + " }");
     }
 
 };

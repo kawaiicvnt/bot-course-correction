@@ -1,5 +1,6 @@
 #include "Helper.h"
-#include "MicroBit.h"
+
+using namespace codal;
 
 int ftoa(float f, char *s, short digits) {
     if (s == NULL)

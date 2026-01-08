@@ -1,12 +1,14 @@
-#include "Debug.h"
-#include "MicroBit.h"
-#include "Magnetometer.h"
-#include "Course.h"
 #include "AlphaBot2.h"
+#include "Course.h"
+#include "Debug.h"
+#include "Magnetometer.h"
+#include "ManagedString.h"
+#include "MicroBit.h"
+#include <cstdint>
 
 extern AlphaBot2 alphabot;
 extern MicroBit uBit;
-extern mag_acc_data ma_d;
+extern mag_acc_data mad;
 
 // Displays a fraction 
 static void fraction_to_display(int value, int max_value) {
@@ -39,7 +41,7 @@ void on_command_receive(MicroBitEvent) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             gd1.update();
             gd2.update();
-            int D1 = ma_d.heading();
+            int D1 = mad.heading();
             int D2 = gd2.heading_tilt();
             printf("H/NT: ");
             printf(D1);
@@ -266,7 +268,7 @@ void compass_clock_fiber() {;
     while (true) {
         // TODO: Add rounding
         // Magnetometer                          // Accelerometer
-        int heading = ma_d.heading_tilt() / 22.5;
+        int heading = mad.heading_tilt() / 22.5;
         // int heading = calc_heading_vertical_normalized(DEFAULT_SAMPLES) / 22.5;
         // heading %= 16; // clock format
         clock_format(heading);
