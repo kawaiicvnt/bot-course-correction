@@ -1,6 +1,5 @@
 .cache
 build
-libraries
 .yotta.json
 yotta_modules
 yotta_targets
