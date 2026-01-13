@@ -1,6 +1,7 @@
 // external deps
 #include "CodalFiber.h"
 #include "Compass.h"
+#include "ExternalEvents.h"
 #include "Magnetometer.h"
 #include "ManagedString.h"
 #include "MicroBit.h"
@@ -13,6 +14,7 @@
 #include "AlphaBot2.h"
 #include "Course.h"
 #include "Debug.h"
+#include "Serial.h"
 
 #define DEBUGLINEWIDTH 60
 
@@ -35,6 +37,13 @@ float steer_weight = 1;
 struct robot_speed {
   int16_t speed_l;
   int16_t speed_r;
+};
+
+// Represents a snapshot of the robot's data and speed values.
+struct debug_bot_state {
+  mag_acc_data mad;       // Magnetometer and accelerometer data.
+  robot_speed speed;      // AlphaBot's speed on each wheel.
+  int16_t target_heading; // Target heading of the robot (in case we're correcting)
 };
 
 int fromHex(ManagedString str) {
@@ -94,7 +103,7 @@ Speed determine_motor_speed_moving(int tar_speed, int tilt, bool forward) {
 }
 
 void move(MicroBitEvent) {
-    ManagedString data = ble_uart->readUntil(ManagedString("\r\n"), SYNC_SLEEP);
+    ManagedString data = ble_uart->readUntil(ManagedString("\r\n"));
     printf(ManagedString("> BLE received: ") + data);
     if (data == "LS") {
         alphabot.MotorRun(Motors::M1, 0);
@@ -151,9 +160,7 @@ int main()
     printf("Done!\n");
 
     printf("> Setting up BLE UART service... ");
-    uBit.bleManager.init("botto(m)", uBit.getSerial(), uBit.messageBus, uBit.storage, false);
-    uBit.bleManager.setTransmitPower(7);
-    uBit.bleManager.advertise();
+    uBit.messageBus.listen(MICROBIT_ID_BLE_UART, MICROBIT_UART_S_EVT_DELIM_MATCH, move);
     ble_uart = new MicroBitUARTService(*uBit.ble, 32, 32);
     ble_uart->eventOn("\r\n");
     printf("Done!\n");
@@ -190,7 +197,6 @@ int main()
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, [](MicroBitEvent) {
         uBit.compass.calibrate();
     });
-    uBit.messageBus.listen(MICROBIT_ID_BLE_UART, MICROBIT_UART_S_EVT_DELIM_MATCH, move);
     printf("Done!\n");
 
     printf("> Finished setup!\n");
