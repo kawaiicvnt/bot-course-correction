@@ -6,14 +6,14 @@
 
 using namespace codal;
 
-#define printf(...) uBit.serial.send(__VA_ARGS__)
+#define PRINT(...) uBit.serial.send(__VA_ARGS__)
 
 #define DEBUG_DATA_SAMPLE_RATE 100 // Hz
 #define DEBUG_DATA_SAMPLE_PERIOD (1000 / DEBUG_DATA_SAMPLE_RATE) // ms
 #define DEBUG_DATA_MAX_SAMPLES 15 * DEBUG_DATA_SAMPLE_RATE // 60 seconds worth of samples
 
 void on_command_receive(MicroBitEvent);
-void setup_debugger();
+void setupDebugger();
 void compass_clock_fiber();
 void clock_format(int heading);
 

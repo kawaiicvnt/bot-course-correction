@@ -32,10 +32,10 @@ static void fraction_to_display(int value, int max_value) {
 }
 
 void on_command_receive(MicroBitEvent) {
-    // printf("receiving message... ");
+    // PRINT("receiving message... ");
     ManagedString data = uBit.serial.readUntil(ManagedString("\r\n"));
-    // printf("received!\n");
-    // printf(ManagedString("Command: ") + data + "\n");
+    // PRINT("received!\n");
+    // PRINT(ManagedString("Command: ") + data + "\n");
     if (data == ManagedString("C")) {
         mag_acc_data gd1 = mag_acc_data(), gd2 = mag_acc_data(); // Separate instance for debugging
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
@@ -43,11 +43,11 @@ void on_command_receive(MicroBitEvent) {
             gd2.update();
             int D1 = mad.heading();
             int D2 = gd2.heading_tilt();
-            printf("H/NT: ");
-            printf(D1);
-            printf(" | H/WT: ");
-            printf(D2);
-            printf("\n");
+            PRINT("H/NT: ");
+            PRINT(D1);
+            PRINT(" | H/WT: ");
+            PRINT(D2);
+            PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("R")) {
@@ -55,43 +55,43 @@ void on_command_receive(MicroBitEvent) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             accel_data = get_acc_data(accel_data);
             ManagedString ret = accel_data.toRot().toString();
-            printf("Rotational: ");
-            printf(ret);
-            printf("\n");
+            PRINT("Rotational: ");
+            PRINT(ret);
+            PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("M")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             ManagedString ret = get_mag_data(false).toString();
-            printf("Magnetometer: ");
-            printf(ret);
-            printf("\n");
+            PRINT("Magnetometer: ");
+            PRINT(ret);
+            PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("A")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             ManagedString ret = get_acc_data(false).toString();
-            printf("Accelerometer: ");
-            printf(ret);
-            printf("\n");
+            PRINT("Accelerometer: ");
+            PRINT(ret);
+            PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("MN")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             g_data data = get_mag_data(true);
             ManagedString ret = data.toString();
-            printf("Magnetometer: ");
-            printf(ret);
-            printf("\n");
+            PRINT("Magnetometer: ");
+            PRINT(ret);
+            PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("AN")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             g_data data = get_acc_data(true);
             ManagedString ret = data.toString();
-            printf("Accelerometer: ");
-            printf(ret);
-            printf("\n");
+            PRINT("Accelerometer: ");
+            PRINT(ret);
+            PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("MNL")) {
@@ -99,9 +99,9 @@ void on_command_receive(MicroBitEvent) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             data = get_mag_data(data);
             ManagedString ret = data.toString();
-            printf("Magnetometer: ");
-            printf(ret);
-            printf("\n");
+            PRINT("Magnetometer: ");
+            PRINT(ret);
+            PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("ANL")) {
@@ -110,34 +110,34 @@ void on_command_receive(MicroBitEvent) {
             data = get_acc_data(data);
 
             ManagedString ret = data.toString();
-            printf("Accelerometer: ");
-            printf(ret);
-            printf("\n");
+            PRINT("Accelerometer: ");
+            PRINT(ret);
+            PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("GC")) {
-        printf("Calibration data: \n");
+        PRINT("Calibration data: \n");
         CompassCalibration calibration = uBit.compass.getCalibration();
         Sample3D centre = calibration.centre;
         Sample3D scale = calibration.scale;
-        printf("Centre: ");
-        printf(ManagedString(centre.x) + ", " + ManagedString(centre.y) + ", " + ManagedString(centre.z) + "\n");
-        printf("Scale: " + ManagedString(scale.x) + ", " + ManagedString(scale.y) + ", " + ManagedString(scale.z) + "\n");
-        printf("Radius: " + ManagedString(calibration.radius) + "\n");
+        PRINT("Centre: ");
+        PRINT(ManagedString(centre.x) + ", " + ManagedString(centre.y) + ", " + ManagedString(centre.z) + "\n");
+        PRINT("Scale: " + ManagedString(scale.x) + ", " + ManagedString(scale.y) + ", " + ManagedString(scale.z) + "\n");
+        PRINT("Radius: " + ManagedString(calibration.radius) + "\n");
     
     } else if (data == ManagedString("CC")) {
         Robot robot;
         robot.set_speed(100, 100, 0);
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             robot.course_correct_towards_origin();
-            printf(robot.toString());
-            printf("\n");
+            PRINT(robot.toString());
+            PRINT("\n");
             uBit.sleep(200);
         }
     } else if (data.charAt(0) == 'C' && data.charAt(1) == 'D') {
         packeddata pdata[DEBUG_DATA_MAX_SAMPLES];
         int i = 0;
-        printf("Ouu husbanto, yu risena tu mucha femtanyal, we aru homuresu\n");
+        PRINT("Ouu husbanto, yu risena tu mucha femtanyal, we aru homuresu\n");
         bool is_acc = data.charAt(2) == 'A';
         bool is_mag = data.charAt(2) == 'M';
         bool is_lpf = data.charAt(3) == 'L';
@@ -170,92 +170,92 @@ void on_command_receive(MicroBitEvent) {
             uBit.sleep(DEBUG_DATA_SAMPLE_PERIOD);
         }
         if (is_acc) {
-            printf("Accelerometer");
+            PRINT("Accelerometer");
         } else if (is_mag) {
-            printf("Magnetometer");
+            PRINT("Magnetometer");
         }
-        printf(" data collected:" + ManagedString(i) + "samples\n");
-        printf("sl;sr;x;y;z\n");
+        PRINT(" data collected:" + ManagedString(i) + "samples\n");
+        PRINT("sl;sr;x;y;z\n");
         for (int j = 0; j < i; j++) {
-            printf(pdata[j].toString());
+            PRINT(pdata[j].toString());
         }
     } else if (data == ManagedString("U")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             int usonic = alphabot.Ultrasonic();
-            printf("Ultrasonic: ");
-            printf(usonic);
-            printf("\n");
+            PRINT("Ultrasonic: ");
+            PRINT(usonic);
+            PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("I")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             bool left = alphabot.Infrared(Sensor::Left);
             bool right = alphabot.Infrared(Sensor::Right);
-            printf("Left: ");
-            printf(left);
-            printf(" | Right");
-            printf(right);
-            printf("\n");
+            PRINT("Left: ");
+            PRINT(left);
+            PRINT(" | Right");
+            PRINT(right);
+            PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("RSMX")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             int *data = alphabot.ReadSensorMax();
-            printf("Sensor Max: ");
+            PRINT("Sensor Max: ");
             for (int i = 0; i < 5; i++) {
-                printf(data[i]);
-                printf(" ");
+                PRINT(data[i]);
+                PRINT(" ");
             }
-            printf("\n");
+            PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("RSMN")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             int *data = alphabot.ReadSensorMin();
-            printf("Sensor Min: ");
+            PRINT("Sensor Min: ");
             for (int i = 0; i < 5; i++) {
-                printf(data[i]);
-                printf(" ");
+                PRINT(data[i]);
+                PRINT(" ");
             }
-            printf("\n");
+            PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("TDS")) {
-        printf("Print int: ");
-        printf(200);
-        printf("\n");
-        printf("Print int via ManagedString: " + ManagedString(200) + "\n");
-        printf(("Print int via ManagedString.toCharArray(): " + ManagedString(200) + "\n").toCharArray());
-        printf(uBit.compass.getX());
-        printf("\n");
+        PRINT("Print int: ");
+        PRINT(200);
+        PRINT("\n");
+        PRINT("Print int via ManagedString: " + ManagedString(200) + "\n");
+        PRINT(("Print int via ManagedString.toCharArray(): " + ManagedString(200) + "\n").toCharArray());
+        PRINT(uBit.compass.getX());
+        PRINT("\n");
     } else {
         uBit.serial.send("\n");
         if (data != ManagedString("H") && data != ManagedString("HELP")
          && data != ManagedString("h") && data != ManagedString("help")
          && data != ManagedString("?"))
             uBit.serial.send("\nUnknown command: " + data + "\n");
-        printf("Available commands:\n");
-        printf("----------------------------------\n");
-        printf("H - Print this help message\n");
-        printf("C - Print compass heading\n");
-        printf("R - Print rotational data (normalized & lpf)\n");
-        printf("M - Print magnetometer data\n");
-        printf("MN - Print normalized magnetometer data\n");
-        printf("MNL - Print normalized + lpf magnetometer data\n");
-        printf("A - Print accelerometer data\n");
-        printf("AN - Print normalized accelerometer data\n");
-        printf("ANL - Print normalized + lpf accelerometer data\n");
-        printf("GC - Print compass calibration data\n");
-        printf("CC - Course correct towards origin\n");
-        printf("U - Print ultrasonic data\n");
-        printf("I - Print infrared data\n");
-        printf("RSMX - Print sensor max\n");
-        printf("RSMN - Print sensor min\n");
-        printf("TDS - Test data sending via serial\n\n");
+        PRINT("Available commands:\n");
+        PRINT("----------------------------------\n");
+        PRINT("H - Print this help message\n");
+        PRINT("C - Print compass heading\n");
+        PRINT("R - Print rotational data (normalized & lpf)\n");
+        PRINT("M - Print magnetometer data\n");
+        PRINT("MN - Print normalized magnetometer data\n");
+        PRINT("MNL - Print normalized + lpf magnetometer data\n");
+        PRINT("A - Print accelerometer data\n");
+        PRINT("AN - Print normalized accelerometer data\n");
+        PRINT("ANL - Print normalized + lpf accelerometer data\n");
+        PRINT("GC - Print compass calibration data\n");
+        PRINT("CC - Course correct towards origin\n");
+        PRINT("U - Print ultrasonic data\n");
+        PRINT("I - Print infrared data\n");
+        PRINT("RSMX - Print sensor max\n");
+        PRINT("RSMN - Print sensor min\n");
+        PRINT("TDS - Test data sending via serial\n\n");
     }
 }
 
-void setup_debugger() {
+void setupDebugger() {
     // uBit.serial.send("> Debug fiber started!\n");
     uBit.serial.init();
     uBit.serial.isReadable();

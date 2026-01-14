@@ -5,22 +5,18 @@
 #include "Magnetometer.h"
 #include "ManagedString.h"
 #include "MicroBit.h"
-#include "MicroBitDevice.h"
 #include "MicroBitEvent.h"
 #include "MicroBitUARTService.h"
 #include <cstdint>
-#include <stdio.h>
 // internal deps
 #include "AlphaBot2.h"
 #include "Course.h"
 #include "Debug.h"
-#include "Serial.h"
 
 #define DEBUGLINEWIDTH 60
 
 // Assuming AlphaBot2 constructor takes no arguments or different arguments
 AlphaBot2 alphabot;
-mag_acc_data mad; // M.A.D. - Magnetometer and Accelerometer Data
 MicroBitUARTService *ble_uart; // The BLE UART service. We can send and receive serial data to and from the connected device, by using this service.
 MicroBit uBit; // The microbit board definition
 
@@ -84,6 +80,7 @@ Speed determine_motor_speed_still(int speed, int tilt) {
     return Speed{speed_l, speed_r};
 }
 
+// Determines how much speed to apply to each wheel if we are on tilted ground.
 Speed determine_motor_speed_moving(int tar_speed, int tilt, bool forward) {
     float speed_l, speed_r;
 
@@ -104,7 +101,7 @@ Speed determine_motor_speed_moving(int tar_speed, int tilt, bool forward) {
 
 void move(MicroBitEvent) {
     ManagedString data = ble_uart->readUntil(ManagedString("\r\n"));
-    printf(ManagedString("> BLE received: ") + data);
+    PRINT(ManagedString("> BLE received: ") + data);
     if (data == "LS") {
         alphabot.MotorRun(Motors::M1, 0);
     } else if (data == "RS") {
@@ -118,14 +115,14 @@ void move(MicroBitEvent) {
         alphabot.MotorRun(Motors::M2, 0);
     } else if (data.charAt(0) == 'F') {
         Speed speed = determine_motor_speed_moving(fromHex(data.substring(1, 2)), fromHex(data.substring(3, 2)), true);
-        printf(ManagedString("--> ") + data.substring(0,1) + ", " + data.substring(1, 2) + ", " + data.substring(3, 2) + " ");
-        printf(ManagedString("--> F | Speed -> L: ") + speed.speed_l + ManagedString(" | R: ") + speed.speed_r);
+        PRINT(ManagedString("--> ") + data.substring(0,1) + ", " + data.substring(1, 2) + ", " + data.substring(3, 2) + " ");
+        PRINT(ManagedString("--> F | Speed -> L: ") + speed.speed_l + ManagedString(" | R: ") + speed.speed_r);
         alphabot.MotorRun(Motors::M1, speed.speed_l);
         alphabot.MotorRun(Motors::M2, speed.speed_r);
     } else if (data.charAt(0) == 'B') {
         Speed speed = determine_motor_speed_moving(fromHex(data.substring(1, 2)), fromHex(data.substring(3, 2)), false);
-        printf(ManagedString("--> ") + data.substring(0,1) + ", " + data.substring(1, 2) + ", " + data.substring(3, 2) + " ");
-        printf(ManagedString("--> B | Speed -> L: ") + speed.speed_l + ManagedString(" | R: ") + speed.speed_r);
+        PRINT(ManagedString("--> ") + data.substring(0,1) + ", " + data.substring(1, 2) + ", " + data.substring(3, 2) + " ");
+        PRINT(ManagedString("--> B | Speed -> L: ") + speed.speed_l + ManagedString(" | R: ") + speed.speed_r);
         alphabot.MotorRun(Motors::M1, -speed.speed_r);
         alphabot.MotorRun(Motors::M2, -speed.speed_l);
     }
@@ -137,36 +134,7 @@ void changeSpeed(MicroBitEvent) {
     uBit.display.printAsync(speed);
 }
 
-int main()
-{
-    uBit.init();
-    printf(ManagedString("\n") + ( DEBUGLINEWIDTH * ManagedString("-") ) + "\n"); // Line separator
-    printf("> Initialized uBit!\n");
-
-    // This is data we've extracted via debugging tools from a running
-    printf("> Setting up pre-calculated calibration data... ");
-    uBit.compass.setCalibration(*def_calib);
-    printf("Done!\n");
-
-    // Set the rotation of the device, to upright, facing away from the user.
-    // To ensure that we calculate the correct compass heading.
-    printf("> Setting up magnetometer and accelerometer fiber... ");
-    mad.init();
-    create_fiber(update_gauss_data_fiber);
-    printf("Done!\n");
-
-    printf("> Setting up debugger event... ");
-    setup_debugger();
-    printf("Done!\n");
-
-    printf("> Setting up BLE UART service... ");
-    uBit.messageBus.listen(MICROBIT_ID_BLE_UART, MICROBIT_UART_S_EVT_DELIM_MATCH, move);
-    ble_uart = new MicroBitUARTService(*uBit.ble, 32, 32);
-    ble_uart->eventOn("\r\n");
-    printf("Done!\n");
-
-
-    printf("> Setting up event listeners... ");
+inline void setupButtons() {
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_B, MICROBIT_BUTTON_EVT_CLICK, [](MicroBitEvent) {
         Robot robot;
         // We wanna stay still and let the AB2 correct it's heading.
@@ -180,7 +148,7 @@ int main()
             alphabot.MotorRun(Motors::M2, robot.cur_speed_r);
             // We update course correction every 10ms, but don't want to clutter our serial.
             if (iterations++ > 10) {
-                printf(robot.toString() + ManagedString("\n"));
+                PRINT(robot.toString() + ManagedString("\n"));
                 iterations = 0;
             }
             uBit.sleep(25);
@@ -197,9 +165,52 @@ int main()
     uBit.messageBus.listen(MICROBIT_ID_BUTTON_AB, MICROBIT_BUTTON_EVT_CLICK, [](MicroBitEvent) {
         uBit.compass.calibrate();
     });
-    printf("Done!\n");
+}
 
-    printf("> Finished setup!\n");
-    printf(( DEBUGLINEWIDTH * ManagedString("-") ) + "\n"); // Line separator
+inline void setupBLEUart() {
+    uBit.messageBus.listen(MICROBIT_ID_BLE_UART, MICROBIT_UART_S_EVT_DELIM_MATCH, move);
+    ble_uart = new MicroBitUARTService(*uBit.ble, 32, 32);
+    ble_uart->eventOn("\r\n");
+}
+
+inline void printLineBreak() {
+    ManagedString line = ManagedString("");
+    for (int i = 0; i < DEBUGLINEWIDTH; i++) {
+        line = line + "-";
+    }
+    PRINT(ManagedString("\n") + line + "\n"); // Line separator
+
+}
+
+int main()
+{
+    uBit.init();
+    printLineBreak();
+    PRINT("> Initialized uBit!\n");
+
+    // This is data we've extracted via debugging tools from a running
+    PRINT("> Setting up pre-calculated calibration data... ");
+    uBit.compass.setCalibration(*def_calib);
+    PRINT("Done!\n");
+
+    PRINT("> Setting up magnetometer and accelerometer fiber... ");
+    create_fiber(update_gauss_data_fiber);
+    PRINT("Done!\n");
+
+    PRINT("> Setting up custom debugger fiber... ");
+    setupDebugger();
+    PRINT("Done!\n");
+
+    PRINT("> Setting up BLE UART service... ");
+    setupBLEUart();
+    PRINT("Done!\n");
+
+
+    PRINT("> Setting up event listeners... ");
+    setupButtons();
+    PRINT("Done!\n");
+
+    PRINT("> Finished setup!");
+    printLineBreak();
     release_fiber();
 }
