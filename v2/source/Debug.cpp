@@ -34,6 +34,7 @@ static void fraction_to_display(int value, int max_value) {
 void on_command_receive(MicroBitEvent) {
     // PRINT("receiving message... ");
     ManagedString data = uBit.serial.readUntil(ManagedString("\r\n"));
+    ManagedString ret;
     // PRINT("received!\n");
     // PRINT(ManagedString("Command: ") + data + "\n");
     if (data == ManagedString("C")) {
@@ -54,7 +55,7 @@ void on_command_receive(MicroBitEvent) {
         g_data accel_data = get_acc_data(true);
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             accel_data = get_acc_data(accel_data);
-            ManagedString ret = accel_data.toRot().toString();
+            ret = accel_data.toRot().toString();
             PRINT("Rotational: ");
             PRINT(ret);
             PRINT("\n");
@@ -62,7 +63,7 @@ void on_command_receive(MicroBitEvent) {
         }
     } else if (data == ManagedString("M")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
-            ManagedString ret = get_mag_data(false).toString();
+            ret = get_mag_data(false).toString();
             PRINT("Magnetometer: ");
             PRINT(ret);
             PRINT("\n");
@@ -70,7 +71,7 @@ void on_command_receive(MicroBitEvent) {
         }
     } else if (data == ManagedString("A")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
-            ManagedString ret = get_acc_data(false).toString();
+            ret = get_acc_data(false).toString();
             PRINT("Accelerometer: ");
             PRINT(ret);
             PRINT("\n");
@@ -79,7 +80,7 @@ void on_command_receive(MicroBitEvent) {
     } else if (data == ManagedString("MN")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             g_data data = get_mag_data(true);
-            ManagedString ret = data.toString();
+            ret = data.toString();
             PRINT("Magnetometer: ");
             PRINT(ret);
             PRINT("\n");
@@ -88,7 +89,7 @@ void on_command_receive(MicroBitEvent) {
     } else if (data == ManagedString("AN")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             g_data data = get_acc_data(true);
-            ManagedString ret = data.toString();
+            ret = data.toString();
             PRINT("Accelerometer: ");
             PRINT(ret);
             PRINT("\n");
@@ -98,7 +99,7 @@ void on_command_receive(MicroBitEvent) {
         g_data data = get_mag_data(true);
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             data = get_mag_data(data);
-            ManagedString ret = data.toString();
+            ret = data.toString();
             PRINT("Magnetometer: ");
             PRINT(ret);
             PRINT("\n");
@@ -108,8 +109,7 @@ void on_command_receive(MicroBitEvent) {
         g_data data = get_acc_data(true);
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             data = get_acc_data(data);
-
-            ManagedString ret = data.toString();
+            ret = data.toString();
             PRINT("Accelerometer: ");
             PRINT(ret);
             PRINT("\n");
