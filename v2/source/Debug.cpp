@@ -56,7 +56,7 @@ void on_command_receive(MicroBitEvent) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             accel_data = get_acc_data(accel_data);
             ret = accel_data.toRot().toString();
-            PRINT("Rotational: ");
+            PRINT("Rot: ");
             PRINT(ret);
             PRINT("\n");
             uBit.sleep(100);
@@ -64,7 +64,7 @@ void on_command_receive(MicroBitEvent) {
     } else if (data == ManagedString("M")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             ret = get_mag_data(false).toString();
-            PRINT("Magnetometer: ");
+            PRINT("Mag: ");
             PRINT(ret);
             PRINT("\n");
             uBit.sleep(100);
@@ -72,7 +72,7 @@ void on_command_receive(MicroBitEvent) {
     } else if (data == ManagedString("A")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             ret = get_acc_data(false).toString();
-            PRINT("Accelerometer: ");
+            PRINT("Acc: ");
             PRINT(ret);
             PRINT("\n");
             uBit.sleep(100);
@@ -81,7 +81,7 @@ void on_command_receive(MicroBitEvent) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             g_data data = get_mag_data(true);
             ret = data.toString();
-            PRINT("Magnetometer: ");
+            PRINT("Mag: ");
             PRINT(ret);
             PRINT("\n");
             uBit.sleep(100);
@@ -90,7 +90,7 @@ void on_command_receive(MicroBitEvent) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             g_data data = get_acc_data(true);
             ret = data.toString();
-            PRINT("Accelerometer: ");
+            PRINT("Acc: ");
             PRINT(ret);
             PRINT("\n");
             uBit.sleep(100);
@@ -100,7 +100,7 @@ void on_command_receive(MicroBitEvent) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             data = get_mag_data(data);
             ret = data.toString();
-            PRINT("Magnetometer: ");
+            PRINT("Mag: ");
             PRINT(ret);
             PRINT("\n");
             uBit.sleep(100);
@@ -110,13 +110,13 @@ void on_command_receive(MicroBitEvent) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
             data = get_acc_data(data);
             ret = data.toString();
-            PRINT("Accelerometer: ");
+            PRINT("Acc: ");
             PRINT(ret);
             PRINT("\n");
             uBit.sleep(100);
         }
     } else if (data == ManagedString("GC")) {
-        PRINT("Calibration data: \n");
+        PRINT("Calib data: \n");
         CompassCalibration calibration = uBit.compass.getCalibration();
         Sample3D centre = calibration.centre;
         Sample3D scale = calibration.scale;
@@ -133,51 +133,6 @@ void on_command_receive(MicroBitEvent) {
             PRINT(robot.toString());
             PRINT("\n");
             uBit.sleep(200);
-        }
-    } else if (data.charAt(0) == 'C' && data.charAt(1) == 'D') {
-        packeddata pdata[DEBUG_DATA_MAX_SAMPLES];
-        int i = 0;
-        PRINT("Ouu husbanto, yu risena tu mucha femtanyal, we aru homuresu\n");
-        bool is_acc = data.charAt(2) == 'A';
-        bool is_mag = data.charAt(2) == 'M';
-        bool is_lpf = data.charAt(3) == 'L';
-        
-        g_data gauss = get_acc_data(true);
-        while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
-            if (i >= DEBUG_DATA_MAX_SAMPLES) {
-                uBit.sleep(100);
-                continue; // Prevent overflow
-            }
-            fraction_to_display(i, DEBUG_DATA_MAX_SAMPLES);
-            if (is_acc) {
-                if (is_lpf)
-                    gauss = get_acc_data(gauss);
-                else
-                    gauss = get_acc_data(false);
-                pdata[i] = packeddata(0, 0, gauss.x, gauss.y, gauss.z);
-            } else if (is_mag) {
-                if (is_lpf)
-                    gauss = get_mag_data(gauss);
-                else
-                    gauss = get_mag_data(false);
-                pdata[i] = packeddata(0, 0, gauss.x, gauss.y, gauss.z);
-            }
-            gauss = get_acc_data(true);
-            i++;
-            if (i >= DEBUG_DATA_MAX_SAMPLES) { // Only scroll once
-                uBit.display.scroll("Overflow!");
-            }
-            uBit.sleep(DEBUG_DATA_SAMPLE_PERIOD);
-        }
-        if (is_acc) {
-            PRINT("Accelerometer");
-        } else if (is_mag) {
-            PRINT("Magnetometer");
-        }
-        PRINT(" data collected:" + ManagedString(i) + "samples\n");
-        PRINT("sl;sr;x;y;z\n");
-        for (int j = 0; j < i; j++) {
-            PRINT(pdata[j].toString());
         }
     } else if (data == ManagedString("U")) {
         while (uBit.serial.readUntil(ManagedString("\r\n"), ASYNC) != ManagedString("E")) {
