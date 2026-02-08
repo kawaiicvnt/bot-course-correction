@@ -17,7 +17,7 @@ This repo, consists of the following areas:
   - can visualize the robot's orientation in 3D space
   - probably will be a separate app
 
-The .old directory contains portions of the project I no longer use:
+In the commit [#d7d5261](../../tree/d7d5261dfeeb25a5737e7ae32004225df6961dff/.old) the .old directory contains portions of the project I no longer use:
 - ~~v1      : microbit-v1 remote-controller code that I use to control the robot-controller~~
 - ~~v2-rust : microbit-v2 robot-controller code port to rust.~~
 - ~~fz      : flipper zero applet that I use for collecting data from the robot, since it has BLE and a shiny microSD card slot :3~~
