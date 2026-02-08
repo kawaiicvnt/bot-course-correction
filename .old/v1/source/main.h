@@ -1,2 +1,0 @@
-#define MENU_DEFAULT 0
-#define MENU_CHANGE_SPEED 1
